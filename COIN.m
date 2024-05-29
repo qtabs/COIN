@@ -22,6 +22,7 @@ classdef COIN < matlab.mixin.Copyable
     %         perturbations                        vector of perturbations (use NaN on channel trials)
     %         cues                                 vector of sensory cues (encode cues as consecutive integers starting from 1)
     %         stationary_trials                    trials on which to set the predicted probabilities to the stationary probabilities (e.g. following a working memory task)
+    %         add_observation_noise                    sample and add sensory noise to the defined perturbations (true) or not (false)
     %     runs
     %         runs                                 number of runs, each conditioned on a different state feedback sequence
     %     parallel processing of runs
@@ -148,6 +149,7 @@ classdef COIN < matlab.mixin.Copyable
         
         % paradigm
         perturbations
+        add_observation_noise = true
         cues
         stationary_trials
         
@@ -709,7 +711,11 @@ classdef COIN < matlab.mixin.Copyable
             D.motor_noise = obj.sigma_motor_noise*randn;
 
             % state feedback
-            D.state_feedback = obj.perturbations(D.t) + D.sensory_noise + D.motor_noise;
+            if obj.add_observation_noise
+                D.state_feedback = obj.perturbations(D.t) + D.sensory_noise + D.motor_noise;
+            else
+                D.state_feedback = obj.perturbations(D.t);
+
 
             % state feedback prediction error
             D.prediction_error = D.state_feedback - D.state_feedback_mean;
