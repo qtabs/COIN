@@ -162,6 +162,7 @@ classdef COIN < matlab.mixin.Copyable
         % model implementation
         particles = 100
         max_contexts = 10
+        verbose = true
         
         % measured adaptation data
         adaptation
@@ -231,7 +232,9 @@ classdef COIN < matlab.mixin.Copyable
                 trials = 1:T;
                 
                 % perform runs
-                fprintf('Simulating the COIN model.\n')
+                if obj.verbose
+                    fprintf('Simulating the COIN model.\n')
+                end
                 parfor (run = 1:obj.runs,obj.max_cores)
                     tmp{run} = obj_store.main_loop(trials).stored;
                 end
@@ -266,10 +269,14 @@ classdef COIN < matlab.mixin.Copyable
 
                     if i == 1
                         trials = 1:adaptation_trials(i);
-                        fprintf('Simulating the COIN model from trial 1 to trial %d.\n',adaptation_trials(i))
+                        if obj.verbose
+                            fprintf('Simulating the COIN model from trial 1 to trial %d.\n',adaptation_trials(i))
+                        end
                     else
                         trials = adaptation_trials(i-1)+1:adaptation_trials(i);
-                        fprintf('Simulating the COIN model from trial %d to trial %d.\n',adaptation_trials(i-1)+1,adaptation_trials(i))
+                        if obj.verbose
+                            fprintf('Simulating the COIN model from trial %d to trial %d.\n',adaptation_trials(i-1)+1,adaptation_trials(i))
+                        end
                     end
 
                     parfor (run = 1:obj.runs,obj.max_cores)
@@ -319,7 +326,9 @@ classdef COIN < matlab.mixin.Copyable
                 elseif adaptation_trials(end) < T
 
                     % simulate to the last trial
-                    fprintf('Simulating the COIN model from trial %d to trial %d.\n',adaptation_trials(end)+1,T)
+                    if obj.verbose
+                        fprintf('Simulating the COIN model from trial %d to trial %d.\n',adaptation_trials(end)+1,T)
+                    end
 
                     trials = adaptation_trials(end)+1:T;
 
@@ -715,7 +724,7 @@ classdef COIN < matlab.mixin.Copyable
                 D.state_feedback = obj.perturbations(D.t) + D.sensory_noise + D.motor_noise;
             else
                 D.state_feedback = obj.perturbations(D.t);
-
+            end
 
             % state feedback prediction error
             D.prediction_error = D.state_feedback - D.state_feedback_mean;
@@ -1146,7 +1155,9 @@ classdef COIN < matlab.mixin.Copyable
                 [obj.cues,~] = find(eq(obj.cues,cue_order')');
             end
             obj.cues = obj.cues';
-            fprintf('Cues have been numbered according to the order they were presented in the experiment.\n')
+            if obj.verbose
+                fprintf('Cues have been numbered according to the order they were presented in the experiment.\n')
+            end
 
         end
          
